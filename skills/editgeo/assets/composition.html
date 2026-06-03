@@ -1,0 +1,86 @@
+<!doctype html>
+<!-- editgeo composition TEMPLATE (render-safe: baked <video> map + HyperFrames overlays + audio).
+     The agent copies this into a HyperFrames project as index.html and edits the marked spots.
+     Map layer: `editgeo export` bakes <video>'s data-ir → assets/maps/<name>.mp4. Overlays/captions = GSAP.
+     Baked-only template; for the live-preview ⇄ video dual-mode see the editgeo-export skill.
+
+     LISTING COPY = HyperFrames VARIABLES (declared on <html data-composition-variables>), read via
+     window.__hyperframes.getVariables(). Set per render with `--variables '{"brand":"…","title":"…"}'`
+     (same mechanism as mapMode). WHITE-LABEL: `brand` defaults to "" — empty shows NO brand. It is the
+     USER's brand/logo (agency/agent), never "EditBĐS". Ask the user; pass it in --variables. -->
+<html lang="en" data-composition-variables='[
+  {"id":"brand","type":"text","label":"Brand (agency/agent — empty = none)","default":""},
+  {"id":"kicker","type":"text","label":"Kicker","default":"FOR SALE · DISTRICT 1"},
+  {"id":"title","type":"text","label":"Title","default":"4-Bedroom Villa"},
+  {"id":"sub","type":"text","label":"Subtitle","default":"320 m² · Bến Thành area"},
+  {"id":"price","type":"text","label":"Price","default":"$420,000"}
+]'>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; font-family: "Inter", system-ui, sans-serif; }
+  #hfmap { position: absolute; inset: 0; width: 1920px; height: 1080px; object-fit: cover; }
+  .ovl { position: absolute; z-index: 20; color: #fff; }
+  .lb { position: absolute; left: 0; width: 100%; height: 64px; background: #000; z-index: 25; }
+  #lbTop { top: 0; } #lbBot { bottom: 0; }
+  #ttl { left: 70px; top: 96px; }
+  #kicker { font-size: 22px; letter-spacing: 6px; font-weight: 700; color: #ffd23c; }
+  #title { font-size: 62px; font-weight: 800; line-height: 1.05; margin-top: 6px; text-shadow: 0 4px 24px rgba(0,0,0,.6); }
+  #sub { font-size: 26px; opacity: .9; margin-top: 8px; }
+  #price { right: 70px; top: 104px; font-size: 40px; font-weight: 800; padding: 10px 20px; border-radius: 14px; background: rgba(255,210,60,.95); color: #1a1500; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+  #progwrap { left: 70px; right: 70px; bottom: 74px; height: 5px; border-radius: 99px; background: rgba(255,255,255,.18); z-index: 26; }
+  #prog { width: 100%; height: 100%; transform-origin: left center; transform: scaleX(0); border-radius: 99px; background: linear-gradient(90deg, #ffd23c, #7fd6ff); }
+  #brand { right: 70px; bottom: 96px; font-size: 22px; font-weight: 700; letter-spacing: 3px; opacity: .85; }
+  #subtitle { left: 50%; transform: translateX(-50%); bottom: 104px; max-width: 1480px; text-align: center; font-size: 34px; font-weight: 700; padding: 12px 26px; border-radius: 14px; background: rgba(8,11,20,.62); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  #subtitle span { opacity: .5; } #subtitle span.on { opacity: 1; color: #ffd23c; }
+</style>
+</head>
+<body>
+<!-- EDIT: data-duration must equal the IR output.duration (= the baked map.mp4 length). -->
+<div id="map-root" data-composition-id="main" data-start="0" data-duration="16.5" data-width="1920" data-height="1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#000">
+  <!-- data-ir = the source IR; `editgeo export` reads it, bakes map.mp4, then renders. data-duration MUST = IR output.duration. -->
+  <video id="hfmap" class="clip" src="assets/maps/map.mp4" data-ir="assets/maps/map.json" data-start="0" data-duration="16.5" data-track-index="0" muted playsinline></video>
+
+  <!-- Overlay text is filled from variables (getVariables) — see <html data-composition-variables>. -->
+  <div class="lb" id="lbTop"></div>
+  <div class="lb" id="lbBot"></div>
+  <div class="ovl" id="ttl"><div id="kicker"></div><div id="title"></div><div id="sub"></div></div>
+  <div class="ovl" id="price"></div>
+  <div class="ovl" id="subtitle"></div>
+  <div class="ovl" id="progwrap"><div id="prog"></div></div>
+  <div class="ovl" id="brand"></div>
+
+  <!-- EDIT: narration audio (from hyperframes tts) + word-timed transcript for captions. -->
+  <audio id="narration" class="clip" src="assets/audio/villa.wav" data-start="0" data-duration="13.27" data-track-index="1" data-volume="1"></audio>
+</div>
+
+<script type="module">
+const DUR = 16.5; // EDIT: = IR output.duration
+// Listing copy comes from HyperFrames variables (declared on <html>, overridable via --variables).
+const V = (window.__hyperframes?.getVariables?.() || {});
+const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = (val ?? "").toString(); };
+setText("kicker", V.kicker); setText("title", V.title); setText("sub", V.sub); setText("price", V.price);
+const brand = (V.brand ?? "").toString().trim();   // white-label: empty → no brand shown
+setText("brand", brand);
+
+let sentences = [];
+function buildSentences(words) { const o = []; let c = []; for (const w of words) { c.push(w); if (/[.!?]$/.test(w.text)) { o.push({ start: c[0].start, end: c[c.length - 1].end, words: c }); c = []; } } if (c.length) o.push({ start: c[0].start, end: c[c.length - 1].end, words: c }); return o; }
+function updateCaption(t) { const s = document.getElementById("subtitle"); const cur = sentences.find((x) => t >= x.start - 0.2 && t <= x.end + 0.5); if (!cur) { s.style.opacity = 0; return; } s.style.opacity = 1; s.innerHTML = cur.words.map((w) => `<span class="${t >= w.start ? "on" : ""}">${w.text}</span>`).join(" "); }
+const capP = { t: 0 }, tl = gsap.timeline({ paused: true });
+function build() {
+  gsap.set("#lbTop", { yPercent: -100 }); gsap.set("#lbBot", { yPercent: 100 });
+  tl.to("#lbTop", { yPercent: 0, duration: 0.6, ease: "power2.out" }, 0).to("#lbBot", { yPercent: 0, duration: 0.6, ease: "power2.out" }, 0);
+  gsap.set("#ttl", { opacity: 0, x: -40 }); tl.to("#ttl", { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 0.6);
+  gsap.set("#price", { opacity: 0, y: -20, scale: 0.9 }); tl.to("#price", { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.6)" }, 1.2);
+  gsap.set("#brand", { opacity: 0 }); if (brand) tl.to("#brand", { opacity: 0.85, duration: 0.6 }, 1.0);  // only animate in if a brand was provided
+  tl.to("#prog", { scaleX: 1, duration: DUR, ease: "none" }, 0);
+  tl.to(capP, { t: DUR, duration: DUR, ease: "none", onUpdate: () => updateCaption(capP.t) }, 0);
+  window.__timelines = window.__timelines || {}; window.__timelines["main"] = tl;
+}
+(async () => { try { const raw = await (await fetch("assets/audio/transcript.json")).json(); const w = Array.isArray(raw) ? raw : (raw.words || Object.values(raw)); sentences = buildSentences(w.filter((x) => x && x.text && typeof x.start === "number")); } catch (e) {} build(); })();
+</script>
+</body>
+</html>

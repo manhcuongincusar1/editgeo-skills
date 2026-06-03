@@ -1,0 +1,11 @@
+{
+  "name": "editgeo",
+  "description": "EditBĐS / editgeo — author map videos for Vietnam real estate as DATA. Describe a place; one IR JSON becomes a map video rendered locally, embeddable into HyperFrames with overlays and captions. Skills: editgeo (authoring), editgeo-cli (login/resolve/preview/render/export), editgeo-data (geocode/route/footprint/road/boundary/POI + VN geography), editgeo-export (HyperFrames integration).",
+  "version": "0.1.0",
+  "author": {
+    "name": "EditBĐS",
+    "url": "https://editbds.com"
+  },
+  "homepage": "https://editbds.com",
+  "license": "UNLICENSED"
+}

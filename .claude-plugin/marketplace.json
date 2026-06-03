@@ -1,0 +1,16 @@
+{
+  "name": "editbds",
+  "owner": {
+    "name": "EditBĐS",
+    "url": "https://editbds.com"
+  },
+  "plugins": [
+    {
+      "name": "editgeo",
+      "source": "./",
+      "description": "Author map videos for Vietnam real estate as DATA — one IR JSON → a map video rendered locally, embeddable into HyperFrames with overlays and captions.",
+      "homepage": "https://editbds.com",
+      "license": "UNLICENSED"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "output": { "width": 1080, "height": 1920, "fps": 30, "duration": 7, "ss": 1.5 },
+  "basemap": {
+    "styleTemplate": "satellite",
+    "vars": { "tiles": "{maptiler}" },
+    "projection": "mercator"
+  },
+  "assets": {
+    "mainRoad": {
+      "id": "mainRoad",
+      "type": "geojson",
+      "name": "Highlight the main road by name (resolved via Overpass → LineString)",
+      "query": { "kind": "road", "name": "Nguyễn Huệ", "near": [106.7028, 10.7740], "radius": 700 }
+    }
+  },
+  "drawingOptions": {
+    "roadGlow": {
+      "id": "roadGlow",
+      "stroke": { "addStroke": true, "strokeColor": { "r": 120, "g": 214, "b": 255, "a": 1 }, "strokeWidth": 5 }
+    }
+  },
+  "slots": [
+    {
+      "id": "cam",
+      "type": "viewport",
+      "items": [
+        { "time": 0, "interpolator": "flyTo", "easer": "inOutQuad", "value": { "lng": 106.7035, "lat": 10.7745, "zoom": 14.4, "bearing": -18, "pitch": 0 } },
+        { "time": 7, "interpolator": "flyTo", "easer": "inOutQuad", "value": { "lng": 106.7028, "lat": 10.7740, "zoom": 15.6, "bearing": -18, "pitch": 45 } }
+      ]
+    },
+    {
+      "id": "road",
+      "type": "geojson",
+      "name": "Self-drawing road highlight (running-light line)",
+      "dataAssetId": "mainRoad",
+      "drawingOptionId": "roadGlow",
+      "items": [
+        { "time": 0.6, "transitionIn": 2.2, "easer": "inOutQuad", "value": { "opacity": 1, "trimLineEnd": 1, "autoTransitionTrim": true } }
+      ]
+    },
+    {
+      "id": "label",
+      "type": "marker",
+      "items": [
+        { "time": 2.4, "transitionIn": 0.6, "easer": "inOutQuad", "value": { "text": "Nguyễn Huệ Boulevard", "lng": 106.7028, "lat": 10.7740, "autoTransitionOpacity": true } }
+      ]
+    }
+  ]
+}

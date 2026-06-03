@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "output": { "width": 1920, "height": 1080, "fps": 30, "duration": 7, "ss": 2 },
+  "basemap": {
+    "styleTemplate": "satellite",
+    "vars": { "tiles": "{maptiler}" },
+    "projection": "mercator"
+  },
+  "assets": {
+    "route1": {
+      "id": "route1",
+      "type": "geojson",
+      "name": "A walking route through District 1",
+      "snap": "driving",
+      "data": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [106.6952, 10.7765],
+                [106.7060, 10.7741]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "drawingOptions": {
+    "redLine": {
+      "id": "redLine",
+      "name": "Red route line",
+      "stroke": { "addStroke": true, "strokeColor": { "r": 255, "g": 60, "b": 50, "a": 1 }, "strokeWidth": 6 }
+    }
+  },
+  "slots": [
+    {
+      "id": "cam",
+      "type": "viewport",
+      "items": [
+        { "time": 0, "interpolator": "flyTo", "easer": "inOutQuad",
+          "value": { "lng": 106.7006, "lat": 10.7761, "zoom": 14.3, "bearing": -10, "pitch": 45 } }
+      ]
+    },
+    {
+      "id": "route",
+      "type": "geojson",
+      "dataAssetId": "route1",
+      "drawingOptionId": "redLine",
+      "items": [
+        { "time": 0.5, "transitionIn": 5.5, "easer": "inOutQuad",
+          "value": { "opacity": 1, "trimLineStart": 0, "trimLineEnd": 1, "autoTransitionOpacity": false } }
+      ]
+    }
+  ]
+}

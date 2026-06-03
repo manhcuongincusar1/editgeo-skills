@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "output": { "width": 1080, "height": 1920, "fps": 30, "duration": 7, "ss": 1.5 },
+  "basemap": {
+    "styleTemplate": "satellite",
+    "vars": { "tiles": "{maptiler}" },
+    "projection": "mercator"
+  },
+  "assets": {
+    "district": {
+      "id": "district",
+      "type": "geojson",
+      "name": "Highlight an admin boundary by name (resolved via Overpass relation → Polygon ring). NOTE: VN abolished Quận/districts in the 2025 reform — use current Phường/ward names.",
+      "query": { "kind": "boundary", "name": "Phường Bến Thành", "near": [106.7009, 10.7769], "radius": 6000 }
+    }
+  },
+  "drawingOptions": {
+    "districtFill": {
+      "id": "districtFill",
+      "fill": { "addFill": true, "fillColor": { "r": 255, "g": 120, "b": 90, "a": 1 }, "opacity": 0.14 },
+      "stroke": { "addStroke": true, "strokeColor": { "r": 255, "g": 140, "b": 100, "a": 1 }, "strokeWidth": 3 }
+    }
+  },
+  "slots": [
+    {
+      "id": "cam",
+      "type": "viewport",
+      "items": [
+        { "time": 0, "interpolator": "flyTo", "easer": "inOutQuad", "value": { "fitFeature": { "slotId": "districtHL", "padding": 120 }, "bearing": 0, "pitch": 0 } }
+      ]
+    },
+    {
+      "id": "districtHL",
+      "type": "geojson",
+      "name": "Boundary highlight (fill + running-light border)",
+      "dataAssetId": "district",
+      "drawingOptionId": "districtFill",
+      "items": [
+        { "time": 0.4, "transitionIn": 1.2, "easer": "inOutQuad", "value": { "opacity": 1, "autoTransitionOpacity": true } }
+      ]
+    },
+    {
+      "id": "label",
+      "type": "marker",
+      "items": [
+        { "time": 1.4, "transitionIn": 0.6, "easer": "inOutQuad", "value": { "text": "Bến Thành Ward", "lng": 106.7009, "lat": 10.7769, "autoTransitionOpacity": true } }
+      ]
+    }
+  ]
+}

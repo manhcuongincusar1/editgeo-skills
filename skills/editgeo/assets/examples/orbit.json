@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "output": { "width": 1080, "height": 1920, "fps": 30, "duration": 8, "ss": 1.5 },
+  "basemap": {
+    "styleTemplate": "satellite",
+    "vars": { "tiles": "{maptiler}" },
+    "projection": "mercator",
+    "buildings3d": true
+  },
+  "assets": {
+    "lot": {
+      "id": "lot",
+      "type": "geojson",
+      "name": "Property footprint",
+      "resolve": "building",
+      "data": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": { "name": "Villa" },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [[
+                [106.70078, 10.77702],
+                [106.70102, 10.77702],
+                [106.70102, 10.77678],
+                [106.70078, 10.77678],
+                [106.70078, 10.77702]
+              ]]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "drawingOptions": {
+    "lotFill": {
+      "id": "lotFill",
+      "fill": { "addFill": true, "fillColor": { "r": 255, "g": 210, "b": 60, "a": 1 }, "opacity": 0.16 },
+      "stroke": { "addStroke": true, "strokeColor": { "r": 255, "g": 210, "b": 60, "a": 1 }, "strokeWidth": 2 }
+    }
+  },
+  "slots": [
+    {
+      "id": "cam",
+      "type": "viewport",
+      "name": "Orbit around the listing — bearing split 0-120-240-360, linear, fixed center (each hop <180° so shortest-arc is correct)",
+      "items": [
+        { "time": 0,    "easer": "linear", "interpolator": "flyTo", "value": { "lng": 106.7009, "lat": 10.7769, "zoom": 17.2, "bearing": 0,   "pitch": 62 } },
+        { "time": 2.67, "easer": "linear", "interpolator": "flyTo", "value": { "lng": 106.7009, "lat": 10.7769, "zoom": 17.2, "bearing": 120, "pitch": 62 } },
+        { "time": 5.33, "easer": "linear", "interpolator": "flyTo", "value": { "lng": 106.7009, "lat": 10.7769, "zoom": 17.2, "bearing": 240, "pitch": 62 } },
+        { "time": 8,    "easer": "linear", "interpolator": "flyTo", "value": { "lng": 106.7009, "lat": 10.7769, "zoom": 17.2, "bearing": 360, "pitch": 62 } }
+      ]
+    },
+    {
+      "id": "world",
+      "type": "world",
+      "items": [ { "time": 0, "value": { "lightAnchor": "viewport", "lightIntensity": 0.5, "lightPositionR": 1.15, "lightPositionA": 210, "lightPositionP": 30 } } ]
+    },
+    {
+      "id": "lotHL",
+      "type": "geojson",
+      "dataAssetId": "lot",
+      "drawingOptionId": "lotFill",
+      "items": [ { "time": 0.4, "transitionIn": 0.8, "easer": "inOutQuad", "value": { "opacity": 1, "autoTransitionOpacity": true } } ]
+    }
+  ]
+}
