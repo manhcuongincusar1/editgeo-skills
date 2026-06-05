@@ -9,15 +9,18 @@ This page teaches the `fx` slot (color/look), the `world` slot (terrain/fog/ligh
 - `styleTemplate` — `satellite` (aerial), `vector` (streets), `white` (clean light — good for label-forward listings), `dark`.
 - `projection` — `globe` (needed for the earth-dive, camera.md) or `mercator` (flat).
 - `buildings3d` — extrude 3D buildings (needs camera `pitch`).
+- `vars.terrainTiles` — a raster-DEM tile URL (terrain-RGB). Needed for **terrain elevation + hillshade** below. `vars.terrainEncoding` (`"mapbox"`|`"terrarium"`, default mapbox), `vars.terrainMaxzoom`.
 
 ## world slot (terrain / fog / light)
-One set of values (first item):
+Keyframeable (interpolated per frame); usually one item is enough:
 ```json
 { "id": "world", "type": "world", "items": [ { "time": 0, "value": {
-  "elevation": 1.1, "fogDensity": 0.05,
-  "lightIntensity": 0.5, "lightPositionR": 1.2, "lightPositionA": 210, "lightPositionP": 35 } } ] }
+  "elevation": 1.5, "fogColor": { "r": 200, "g": 214, "b": 235, "a": 1 }, "fogDensity": 0.3, "hillshadeOpacity": 0.5,
+  "lightIntensity": 0.55, "lightPositionR": 1.2, "lightPositionA": 210, "lightPositionP": 35 } } ] }
 ```
-- `elevation` — terrain exaggeration. `fogDensity` — atmospheric haze.
+- `elevation` — terrain exaggeration (3D relief). **Requires `basemap.vars.terrainTiles`.** Animatable.
+- `fogColor` `{r,g,b,a}` + `fogDensity` (0–1) — atmospheric haze / horizon blend.
+- `hillshadeOpacity` — terrain shading strength (also needs `terrainTiles`). Best on hilly/coastal areas; invisible on flat ground.
 - `light*` — sun: intensity, radial/azimuth/polar position (controls building shadows).
 
 ## fx slot (grade / vignette / tilt-shift)

@@ -1,6 +1,6 @@
 # Recipes — common BĐS shots, end to end
 
-This page gives ready patterns that combine camera + data + markers. Each names the DataAsset directive it needs (baked by `editgeo resolve` — see editgeo-data) and the slots to write. Pair with the example IRs in `assets/examples/`.
+This page gives ready patterns that combine camera + data + markers. Each names the DataAsset directive it needs (baked by `editgeo resolve` — see editgeo-data) and the slots to write.
 
 ## Highlight a plot / building
 Trace the real footprint and label its size.
@@ -51,3 +51,17 @@ Boundary → filled polygon with a light-running border; road → a highlighted 
   "query": { "kind": "poi", "category": "school", "near": [106.70, 10.776], "radius": 1500, "limit": 6 } } }
 ```
 The points auto-become markers (markers.md). Combine with routes to show "X minutes to school/market/hospital".
+
+## Subdivide land into lots (phân lô) — the staggered reveal
+For a "phân lô bán nền" project, draw each lot as its **own** `geojson` slot (so it gets its own border + reveal time), and number them with one `marker` slot. Zoom in close so the grid fills frame.
+- One DataAsset per lot (a small Polygon), one `geojson` slot each; stagger `items[].time` (e.g. `13 + i*0.55`) for a one-by-one draw-on.
+- Color-code by sharing two drawingOptions: e.g. `lotAvail` (gold) vs `lotSold` (gray).
+- Lot numbers: a single `marker` slot whose `items[]` are the per-lot labels (`text:"1".."N"`, centered on each lot, staggered).
+- Wrap the block in a master-parcel Polygon + spotlight (`media` `clipMode:"mask"`, media.md) and a glowing border (stroke + `trimLineEnd`).
+- A builder script that loops the grid keeps the IR small. Add `extrusion` on a few lots for 3D "nhà mẫu".
+
+## Clip satellite/render imagery to a parcel (masked-imagery hero)
+A `media` image clipped to the plot shape, real basemap kept around it, glowing border — the premium "here's the land" shot. See [media.md](media.md) (`clipMode:"clip"` keeps the map outside; `"mask"` spotlights). Pair with the plot's own border slot revealing via `trimLineEnd`.
+
+## Data over time (by year) / a moving trip
+Earthquakes/sales/projects appearing year by year, or a delivery trip with a comet trail. Declare `DataAsset.time` (events or trip) + keyframe the `now` playhead on the slot — see [temporal.md](temporal.md). Use `pointMode:"circle"`/`"heatmap"` for many points.

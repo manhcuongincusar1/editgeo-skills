@@ -24,6 +24,17 @@ Add `subtitle` for a station/place card — tên + mô tả ngắn:
 { "value": { "text": "Ga Bến Thành", "subtitle": "Đầu tuyến · trung tâm Q.1", "lng": 106.698, "lat": 10.772 } }
 ```
 
+## Rich content card (chart / image / html / video)
+A marker card can hold rich content anchored to lng/lat (upright, camera-tracked):
+```json
+{ "value": { "lng": 106.70, "lat": 10.776, "text": "Giá/m² (triệu)",
+  "chart": { "type": "bar", "title": "2020→2025", "color": { "r": 255,"g":205,"b":70,"a":1 },
+             "data": [ {"value":28},{"value":41},{"value":50},{"value":62},{"value":78} ] } } }
+```
+- `chart` — inline-SVG chart (`type`: `"bar"`|`"line"`|`"donut"`; `data:[{label?,value,color?}]`; `title?`,`color?`,`max?`). Deterministic, no dependency — price trends, unit mix, growth.
+- `image` — `<img>` URL/data-URI in the card (`imageWidth?` px). `video` — frame-synced `<video>` (no autoplay). `html` — raw HTML in the card body.
+*(Geo-anchored. For a photo/video painted ON the ground by 4 corners, use the `media` slot — see media.md.)*
+
 ## Icons
 `icon` accepts:
 - An **emoji** — `"🚇"`, `"★"` (used as-is, no resolve).

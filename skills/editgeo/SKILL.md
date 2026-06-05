@@ -1,6 +1,6 @@
 ---
 name: editgeo
-description: Author animated MAP videos for the EditBĐS / editgeo engine from natural language — fly-to, orbit, cinematic earth-dive, draw routes, highlight a building or boundary, mark places, show paths and travel times, with on-map labels and info boxes. Use when asked to "add a map", "make a map video", "fly to <place>", "highlight <road/building/ward>", "show the route/paths to ...", "intro video for <area/line>", or any geographic shot for a real-estate (BĐS) or location video. You write ONE IR JSON; the map is DATA, never hand-written code. For the resolver/data directives (geocode, route snap, building footprint, road/boundary, POI, VN admin geography) see the editgeo-data skill; for CLI commands (login, resolve, preview, render, export) see the editgeo-cli skill; for embedding the baked map into a HyperFrames video with overlays/captions see the editgeo-export skill.
+description: Author animated MAP videos for the EditBĐS / editgeo engine from natural language — fly-to, orbit, cinematic earth-dive, draw routes, highlight a building/boundary, subdivide land into lots (phân lô), grow 3D buildings, clip satellite imagery to a parcel, animate data over time (events by year / a moving trip), heatmaps, on-map charts (giá/m², unit mix), and labels/info boxes. Use when asked to "add a map", "make a map video", "fly to <place>", "highlight <road/building/ward>", "phân lô / chia nền", "show the route/travel time to ...", "show <data> by year / over time", "biểu đồ giá trên bản đồ", "clip ảnh theo ranh", "intro/showcase video for <project/area/line>", or any geographic shot for a real-estate (BĐS) or location video. You write ONE IR JSON; the map is DATA, never hand-written code. For the resolver/data directives (geocode, route snap, building footprint, road/boundary, POI, VN admin geography) see the editgeo-data skill; for CLI commands (login, resolve, preview, render, export) see the editgeo-cli skill; for embedding the baked map into a HyperFrames video with overlays/captions see the editgeo-export skill.
 ---
 
 # editgeo — map videos as data
@@ -19,17 +19,23 @@ For specific asks ("highlight this plot", "fix the camera on scene 2"), skip dis
 
 ### Author the IR
 Write against **`schema/map-ir.ts`** (typed) / **`schema/map-ir.schema.json`** (validated). Top-level shape:
-`output` · `basemap` · `slots[]` · `assets{}` (DataAssets) · `drawingOptions` · `markerTemplates`.
-Full field reference: **[references/schema.md](references/schema.md)**. Example IRs: **[assets/examples/](assets/examples/)**.
+`output` · `basemap` · `slots[]` · `assets{}` (DataAssets) · `drawingOptions` · `markerTemplates` · `images{}` · `media{}`.
+Full field reference: **[references/schema.md](references/schema.md)** (it carries inline IR snippets for every shape).
+
+**Before authoring anything cinematic, read [references/cinematography.md](references/cinematography.md)** — the EditBĐS house style (prescriptive defaults, easing-as-emotion, Build→Breathe→Resolve, the warm grade, and the anti-pattern list that separates a cinematic map from a generic "AI map"). It is the difference between *correct* and *good*.
 
 Pick the shot(s) and follow the matching reference:
 | Want | Reference |
 |---|---|
+| **House style: look, easing, pacing, grade, presets, anti-patterns** | **[references/cinematography.md](references/cinematography.md)** |
 | Camera: fly-to / orbit / cinematic earth-dive / follow-route / fit-bounds | [references/camera.md](references/camera.md) |
-| Markers, on-map labels, 2-line info boxes, icons | [references/markers.md](references/markers.md) |
+| Layer style: fill/stroke, dash + marching-ants, pattern, road casing, 3D extrusion, circle/heatmap, raw paint passthrough | [references/layers-styling.md](references/layers-styling.md) |
+| Markers, info boxes, icons, **rich cards (chart/image/video/html)** | [references/markers.md](references/markers.md) |
+| Time-series: events by year, moving trip + comet trail (the `now` playhead) | [references/temporal.md](references/temporal.md) |
+| Image/video painted on the ground; **clip imagery to a parcel/boundary** | [references/media.md](references/media.md) |
 | Area/frontage/route-length/ETA/distance → printed labels | [references/measurements.md](references/measurements.md) |
-| Recipes: journey, highlight a building/plot, draw a route, highlight a ward/road | [references/recipes.md](references/recipes.md) |
-| Color grade, vignette, tilt-shift, terrain/fog/light, basemap style | [references/fx-world.md](references/fx-world.md) |
+| Recipes: journey, highlight a building/plot/division, draw a route, ward/road | [references/recipes.md](references/recipes.md) |
+| Color grade, vignette, tilt-shift, terrain/fog/hillshade/light, basemap style | [references/fx-world.md](references/fx-world.md) |
 | Real geometry (geocode, route, footprint, road/boundary, POI) + VN geography | **editgeo-data** skill |
 
 ### Workflow (two phases — see editgeo-cli + editgeo-export)
@@ -42,7 +48,17 @@ Pick the shot(s) and follow the matching reference:
 2. **Resolve before preview/render.** After `resolve`, the IR holds only concrete geometry — no unresolved directives. This is the Single Source of Truth: same IR → same pixels, offline, deterministic.
 3. **Preview before export.** Show the live map and get approval first. Iterating is instant; exporting an MP4 is not — never bake per prompt.
 4. **Deterministic.** No `Date.now`, no randomness, no in-render fetches. The baked IR renders the same every time.
-5. **House feel:** fast, decisive motion; white/clean or satellite basemap; labels at video scale (not web-UI opacity).
+5. **House feel:** fast, decisive, *cinematic* motion. **Always set `defaultEaser: "inOutQuart"` + `viewportSmoothing: 0.4`** (a camera that glides, not snaps). Warm satellite/dark look; labels at video scale (not web-UI opacity). Full gu: [references/cinematography.md](references/cinematography.md).
+
+## Cinematic quality bar (the gu — enforce, don't skip)
+A map that is *correct* but *generic* is the failure mode. These are hard rules — follow them unless the user asks otherwise. Full reasoning + presets: **[references/cinematography.md](references/cinematography.md)**.
+- **Easing is the adverb — vary it.** ≥2 distinct easers across the timeline; the slowest move ~3× slower than the fastest. One easer on everything = "AI map".
+- **Every shot: Build → Breathe → Resolve.** The camera never hard-stops — the breathe beat keeps a subtle drift (a few degrees of bearing / a hair of zoom) while markers/borders reveal.
+- **Vary the camera move.** Not flyTo+zoom every time — orbit, pull-back, follow-route, fit-bounds, or a static hold with a marker reveal (pick by subject).
+- **Never a naked frame.** Every IR has an `fx` slot (warm grade + vignette, subtle at the wide → lifted on arrival) and a `world` slot (golden light/fog). Every shot has ≥1 focal accent.
+- **Markers at video scale, staggered, asymmetric** (entranceIn > exitOut; total stagger <500ms).
+- **Don't:** start everything at `t=0` (offset the open 0.2–0.3s) · stack eased waypoints in an earth-dive (one segment, fixed center) · spin `bearing` 0→360 in one keyframe (hops <180°) · over-grade (sat/contrast ≤1.3).
+- **Before `preview`, run the pre-preview checklist** at the end of cinematography.md.
 
 ## Code blocks are labeled with their file
 When you show IR, label the block with the filename so it's clear what to write, e.g.:

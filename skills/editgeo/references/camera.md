@@ -38,7 +38,7 @@ Bearing interpolates by **shortest arc**, so a single `0 → 360` keyframe spins
 { "time": 6, "easer": "linear", "value": { "...", "bearing": 240 } },
 { "time": 9, "easer": "linear", "value": { "...", "bearing": 360 } }
 ```
-Set `basemap.buildings3d: true` and `pitch ~60`. See `assets/examples/orbit.json`.
+Set `basemap.buildings3d: true` and `pitch ~60` (hold center; step `bearing` across keyframes).
 
 ## Fit a feature in frame (fit-bounds)
 Frame a route or plot to its extent — the engine computes the camera from the feature's bounds:
