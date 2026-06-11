@@ -38,5 +38,5 @@ Keyframe `now` on the geojson slot's items (linear easer = constant speed):
 At each frame the engine interpolates `now` and reveals/animates accordingly. Same IR → same frame. (For a trip, keyframe `now` from `start`→`end`.)
 
 ## Notes
-- A temporal slot needs **≥2 `now` keyframes** or it never advances.
+- No `now` keyframes at all → the engine auto-ramps `now` **linearly `start`→`end`** over the slot's life (first item time → last item end; no duration → video end). Keyframe `value.now` (≥2 keyframes) to control pacing — and then keyframe it on EVERY item of the slot (a mixed slot stays on the keyframed path; items without `now` fall back to `start`).
 - Times must be numeric (and for trips, monotonic, one per vertex). No resolver step — temporal is authored data, not baked.
